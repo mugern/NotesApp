@@ -1,0 +1,4 @@
+@echo off
+cd /d "%~dp0"
+cd Launcher\bin\Debug\net6.0
+Launcher.exe

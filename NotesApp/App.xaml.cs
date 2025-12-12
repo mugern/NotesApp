@@ -1,0 +1,35 @@
+using System;
+using System.Windows;
+using NotesApp.Data;
+using MaterialDesignThemes.Wpf;
+
+namespace NotesApp
+{
+    public partial class App : Application
+    {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            
+            // Ставим светлую тему по умолчанию, как просил босс
+            var paletteHelper = new PaletteHelper();
+            var theme = paletteHelper.GetTheme();
+            theme.SetBaseTheme(Theme.Light);
+            paletteHelper.SetTheme(theme);
+            
+            // Инициализируем базу данных, надеемся что не упадет
+            try
+            {
+                using (var context = new NotesAppContext())
+                {
+                    context.Database.EnsureCreated();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Не удалось инициализировать базу данных: {ex.Message}", "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
+                Shutdown();
+            }
+        }
+    }
+}

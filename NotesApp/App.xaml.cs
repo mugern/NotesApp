@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using NotesApp.Data;
+using NotesApp.Utils;
 using MaterialDesignThemes.Wpf;
 
 namespace NotesApp
@@ -29,6 +30,22 @@ namespace NotesApp
             {
                 MessageBox.Show($"Не удалось инициализировать базу данных: {ex.Message}", "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
                 Shutdown();
+            }
+            
+            // Очищаем истекшие заметки
+            try
+            {
+                int deletedCount = NoteCleanupService.CleanupNotes();
+                if (deletedCount > 0)
+                {
+                    // Можно добавить логирование или уведомление о количестве удаленных заметок
+                }
+            }
+            catch (Exception ex)
+            {
+                // Просто логируем ошибку, но не прерываем запуск приложения
+                // В реальном приложении здесь должно быть логирование
+                System.Diagnostics.Debug.WriteLine($"Ошибка при очистке заметок: {ex.Message}");
             }
         }
     }

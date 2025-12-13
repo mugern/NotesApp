@@ -45,6 +45,7 @@ namespace NotesApp.Views
             if (_note != null)
             {
                 Title = "Редактировать заметку";
+                WindowTitleTextBlock.Text = "Редактировать заметку";
                 TitleTextBox.Text = _note.Title;
                 ContentTextBox.Text = _note.Content;
                 
@@ -64,6 +65,7 @@ namespace NotesApp.Views
             else
             {
                 Title = "Создать заметку";
+                WindowTitleTextBlock.Text = "Создать заметку";
             }
         }
 
@@ -99,9 +101,14 @@ namespace NotesApp.Views
                     else
                     {
                         // Правим старую заметку
-                        _note.Title = title;
-                        _note.Content = content;
-                        _note.UpdatedAt = DateTime.UtcNow;
+                        // Загружаем заметку заново из базы данных
+                        var noteToUpdate = context.Notes.Find(_note.Id);
+                        if (noteToUpdate != null)
+                        {
+                            noteToUpdate.Title = title;
+                            noteToUpdate.Content = content;
+                            noteToUpdate.UpdatedAt = DateTime.UtcNow;
+                        }
                     }
                     
                     // Ставим папку, если выбрали

@@ -79,6 +79,8 @@ namespace NotesApp.Views
                     }
                     
                     _notes = query.ToList();
+                    // Добавляем небольшую задержку для обеспечения правильной загрузки данных
+                    System.Threading.Thread.Sleep(10);
                     DisplayNotes(resetSelection);
                 }
             }
@@ -135,6 +137,10 @@ namespace NotesApp.Views
                         notePanel = CreateNotePanel(note, out folderTextBlock, out titleTextBlock, out contentTextBlock, out dateTextBlock);
                         noteBorder.Child = notePanel;
                     }
+                    
+                    // Обновляем обработчик клика
+                    noteBorder.MouseLeftButtonUp -= (sender, e) => SelectNote(note, noteBorder);
+                    noteBorder.MouseLeftButtonUp += (sender, e) => SelectNote(note, noteBorder);
                 }
                 else
                 {

@@ -31,7 +31,7 @@
                     Style="{StaticResource MaterialDesignComboBox}"/>
         </Grid>
 
-        <TextBox Grid.Row="3" x:Name="ContentTextBox" AcceptsReturn="True" TextWrapping="Wrap" Background="DarkSlateBlue" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"
+        <TextBox Grid.Row="3" x:Name="ContentTextBox" AcceptsReturn="True" TextWrapping="Wrap"  VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"
                 Style="{StaticResource MaterialDesignTextBox}"/>
         
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">

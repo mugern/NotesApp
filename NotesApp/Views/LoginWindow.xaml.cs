@@ -47,6 +47,7 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 ShowError($"Ошибка входа: {ex.Message}");
+                // Продолжаем работу приложения, не прерывая его
             }
         }
 
@@ -89,6 +90,7 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 ShowError($"Ошибка регистрации: {ex.Message}");
+                // Продолжаем работу приложения, не прерывая его
             }
         }
 

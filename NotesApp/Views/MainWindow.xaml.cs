@@ -31,6 +31,13 @@ namespace NotesApp.Views
             LoadNotes();
         }
 
+        private void LogError(Exception ex, string methodName)
+        {
+            // В реальном приложении здесь должно быть полноценное логирование
+            System.Diagnostics.Debug.WriteLine($"Ошибка в методе {methodName}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
+
         private void LoadFolders()
         {
             try
@@ -46,7 +53,12 @@ namespace NotesApp.Views
             }
             catch (Exception ex)
             {
+                LogError(ex, "LoadFolders");
                 MessageBox.Show($"Не удалось загрузить папки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Сбрасываем выбор папки и список папок, чтобы пользователь мог продолжить работу
+                FoldersList.ItemsSource = null;
+                _selectedFolder = null;
+                // Продолжаем работу приложения, не прерывая его
             }
         }
 
@@ -72,7 +84,12 @@ namespace NotesApp.Views
             }
             catch (Exception ex)
             {
+                LogError(ex, "LoadNotes");
                 MessageBox.Show($"Не удалось загрузить заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Инициализируем пустой список заметок, чтобы приложение могло продолжить работу
+                _notes = new List<Note>();
+                DisplayNotes(resetSelection);
+                // Продолжаем работу приложения, не прерывая его
             }
         }
 

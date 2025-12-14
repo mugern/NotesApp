@@ -43,6 +43,10 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось загрузить заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Инициализируем пустой список заметок, чтобы приложение могло продолжить работу
+                _notes = new List<Note>();
+                DisplayNotes();
+                // Продолжаем работу приложения, не прерывая его
             }
         }
 
@@ -200,6 +204,7 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось создать папку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Не закрываем окно, чтобы пользователь мог попробовать снова
             }
         }
 

@@ -29,6 +29,10 @@ namespace NotesApp
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось инициализировать базу данных: {ex.Message}", "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Показываем окно входа, даже если база данных не инициализирована
+                var loginWindow = new Views.LoginWindow();
+                loginWindow.Show();
+                // Закрываем приложение, если база данных не может быть инициализирована
                 Shutdown();
             }
             
@@ -46,6 +50,7 @@ namespace NotesApp
                 // Просто логируем ошибку, но не прерываем запуск приложения
                 // В реальном приложении здесь должно быть логирование
                 System.Diagnostics.Debug.WriteLine($"Ошибка при очистке заметок: {ex.Message}");
+                // Продолжаем работу приложения, не прерывая его
             }
         }
     }

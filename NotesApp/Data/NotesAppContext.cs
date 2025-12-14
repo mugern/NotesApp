@@ -1,3 +1,4 @@
+using System;
 using Microsoft.EntityFrameworkCore;
 using NotesApp.Models;
 
@@ -11,8 +12,25 @@ namespace NotesApp.Data
         public DbSet<SharedNote> SharedNotes { get; set; }
         public DbSet<Reminder> Reminders { get; set; }
 
+        public static void LogError(Exception ex, string methodName)
+        {
+            // В реальном приложении здесь должно быть полноценное логирование
+            System.Diagnostics.Debug.WriteLine($"Ошибка в методе {methodName}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseNpgsql("Host=node-6b2e4.smrgames.ru;Port=58002;Database=app;Username=postgres;Password=Pl3453Ch4n63M3!");
+        {
+            try
+            {
+                options.UseNpgsql("Host=node-6b2e4.smrgames.ru;Port=58002;Database=app;Username=postgres;Password=Pl3453Ch4n63M3!");
+            }
+            catch (Exception ex)
+            {
+                LogError(ex, "OnConfiguring");
+                throw; // Пробрасываем исключение дальше, чтобы приложение могло обработать его правильно
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -10,6 +10,13 @@ namespace NotesApp.Views
     {
         private User _currentUser;
         private Note _note;
+        
+        private void LogError(Exception ex, string methodName)
+        {
+            // В реальном приложении здесь должно быть полноценное логирование
+            System.Diagnostics.Debug.WriteLine($"Ошибка в методе {methodName}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
+        }
 
         public NoteEditorWindow(User user, Note note)
         {
@@ -36,7 +43,10 @@ namespace NotesApp.Views
             }
             catch (Exception ex)
             {
+                LogError(ex, "LoadFolders");
                 MessageBox.Show($"Не удалось загрузить папки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Продолжаем работу приложения, не прерывая его
+                FolderComboBox.ItemsSource = null;
             }
         }
 
@@ -82,49 +92,65 @@ namespace NotesApp.Views
             
             try
             {
-                using (var context = new NotesAppContext())
+                if (FolderComboBox.SelectedItem != null)
                 {
-                    if (_note == null)
+                    using (var context = new NotesAppContext())
                     {
-                        // Делаем новую заметку
-                        _note = new Note
+                        if (_note == null)
                         {
-                            Title = title,
-                            Content = content,
-                            AuthorId = _currentUser.Id,
-                            CreatedAt = DateTime.UtcNow,
-                            UpdatedAt = DateTime.UtcNow
-                        };
-                        
-                        context.Notes.Add(_note);
-                    }
-                    else
-                    {
-                        // Правим старую заметку
-                        // Загружаем заметку заново из базы данных
-                        var noteToUpdate = context.Notes.Find(_note.Id);
-                        if (noteToUpdate != null)
-                        {
-                            noteToUpdate.Title = title;
-                            noteToUpdate.Content = content;
-                            noteToUpdate.UpdatedAt = DateTime.UtcNow;
+                            // Делаем новую заметку
+                            _note = new Note
+                            {
+                                Title = title,
+                                Content = content,
+                                AuthorId = _currentUser.Id,
+                                CreatedAt = DateTime.UtcNow,
+                                UpdatedAt = DateTime.UtcNow
+                            };
+
+                            context.Notes.Add(_note);
                         }
+                        else
+                        {
+                            // Правим старую заметку
+                            // Загружаем заметку заново из базы данных
+                            var noteToUpdate = context.Notes.Find(_note.Id);
+                            if (noteToUpdate != null)
+                            {
+                                noteToUpdate.Title = title;
+                                noteToUpdate.Content = content;
+                                noteToUpdate.UpdatedAt = DateTime.UtcNow;
+                                // Обновляем папку для существующей заметки
+                                var selectedFolder = FolderComboBox.SelectedItem as Folder;
+                                noteToUpdate.FolderId = selectedFolder?.Id;
+                            }
+                        }
+
+                        // Устанавливаем папку для новой заметки
+                        if (_note != null && _note.Id == 0) // Новая заметка
+                        {
+                            var selectedFolder = FolderComboBox.SelectedItem as Folder;
+                            _note.FolderId = selectedFolder?.Id;
+                        }
+
+                        context.SaveChanges();
+
+                        MessageBox.Show("Заметка успешно сохранена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                        this.DialogResult = true;
+                        this.Close();
                     }
-                    
-                    // Ставим папку, если выбрали
-                    var selectedFolder = FolderComboBox.SelectedItem as Folder;
-                    _note.FolderId = selectedFolder?.Id;
-                    
-                    context.SaveChanges();
-                    
-                    MessageBox.Show("Заметка успешно сохранена.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    this.DialogResult = true;
-                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Выберите папку, сударь", "Внимание", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
             {
+                LogError(ex, "SaveButton_Click");
                 MessageBox.Show($"Не удалось сохранить заметку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Не закрываем окно, чтобы пользователь мог попробовать снова
+                // Продолжаем работу приложения, не прерывая его
             }
         }
 

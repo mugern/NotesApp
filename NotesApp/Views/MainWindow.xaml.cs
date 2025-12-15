@@ -22,7 +22,7 @@ namespace NotesApp.Views
         {
             InitializeComponent();
             _currentUser = user;
-            // Отображаем имя пользователя
+            // Отображение имени пользователя
             if (UsernameTextBlock != null)
             {
                 UsernameTextBlock.Text = _currentUser.Username;
@@ -33,7 +33,7 @@ namespace NotesApp.Views
 
         private void LogError(Exception ex, string methodName)
         {
-            // В реальном приложении здесь должно быть полноценное логирование
+            // Логирование ошибок
             System.Diagnostics.Debug.WriteLine($"Ошибка в методе {methodName}: {ex.Message}");
             System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
         }
@@ -55,10 +55,10 @@ namespace NotesApp.Views
             {
                 LogError(ex, "LoadFolders");
                 MessageBox.Show($"Не удалось загрузить папки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Сбрасываем выбор папки и список папок, чтобы пользователь мог продолжить работу
+                // Сброс выбора папки
                 FoldersList.ItemsSource = null;
                 _selectedFolder = null;
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
             }
         }
 
@@ -69,17 +69,17 @@ namespace NotesApp.Views
                 using (var context = new NotesAppContext())
                 {
                     IQueryable<Note> query = context.Notes
-                        .Include(n => n.Folder) // Включаем данные папки
+                        .Include(n => n.Folder) // Данные папки
                         .Where(n => n.AuthorId == _currentUser.Id && n.DeletedAt == null && n.IsArchived == false);
                     
-                    // Фильтруем по папке, если выбрана
+                    // Фильтр по папке
                     if (_selectedFolder != null)
                     {
                         query = query.Where(n => n.FolderId == _selectedFolder.Id);
                     }
                     
                     _notes = query.ToList();
-                    // Добавляем небольшую задержку для обеспечения правильной загрузки данных
+                    // Задержка для загрузки
                     System.Threading.Thread.Sleep(10);
                     DisplayNotes(resetSelection);
                 }
@@ -88,22 +88,22 @@ namespace NotesApp.Views
             {
                 LogError(ex, "LoadNotes");
                 MessageBox.Show($"Не удалось загрузить заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Инициализируем пустой список заметок, чтобы приложение могло продолжить работу
+                // Пустой список заметок
                 _notes = new List<Note>();
                 DisplayNotes(resetSelection);
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
             }
         }
 
         private void DisplayNotes(bool resetSelection = true)
         {
-            // Сбрасываем выбор заметки, если требуется
+            // Сброс выбора заметки
             if (resetSelection)
             {
                 ResetNoteSelection();
             }
             
-            // Обновляем существующие заметки или создаем новые
+            // Обновление заметок
             for (int i = 0; i < _notes.Count; i++)
             {
                 var note = _notes[i];
@@ -111,14 +111,14 @@ namespace NotesApp.Views
                 StackPanel notePanel;
                 TextBlock folderTextBlock, titleTextBlock, contentTextBlock, dateTextBlock;
                 
-                // Проверяем, существует ли уже элемент для этой заметки
+                // Проверка существующего элемента
                 if (i < BackgroundNotes.Children.Count && BackgroundNotes.Children[i] is Border existingBorder)
                 {
-                    // Используем существующий элемент
+                    // Используем существующий
                     noteBorder = existingBorder;
                     notePanel = noteBorder.Child as StackPanel;
                     
-                    // Обновляем содержимое элементов
+                    // Обновляем содержимое
                     if (notePanel != null && notePanel.Children.Count >= 4)
                     {
                         folderTextBlock = notePanel.Children[0] as TextBlock;
@@ -133,18 +133,18 @@ namespace NotesApp.Views
                     }
                     else
                     {
-                        // Если структура не соответствует, создаем заново
+                        // Создаем заново
                         notePanel = CreateNotePanel(note, out folderTextBlock, out titleTextBlock, out contentTextBlock, out dateTextBlock);
                         noteBorder.Child = notePanel;
                     }
                     
-                    // Обновляем обработчик клика
+                    // Обновляем обработчик
                     noteBorder.MouseLeftButtonUp -= (sender, e) => SelectNote(note, noteBorder);
                     noteBorder.MouseLeftButtonUp += (sender, e) => SelectNote(note, noteBorder);
                 }
                 else
                 {
-                    // Создаем новый элемент для динамических заметок
+                    // Создаем новый элемент
                     noteBorder = new Border
                     {
                         MinWidth = 180,
@@ -160,27 +160,27 @@ namespace NotesApp.Views
                     notePanel = CreateNotePanel(note, out folderTextBlock, out titleTextBlock, out contentTextBlock, out dateTextBlock);
                     noteBorder.Child = notePanel;
                     
-                    // Добавляем обработчик клика для выбора заметки
+                    // Добавляем обработчик
                     noteBorder.MouseLeftButtonUp += (sender, e) => SelectNote(note, noteBorder);
                     
-                    // Добавляем контейнер в панель заметок
+                    // Добавляем в панель
                     BackgroundNotes.Children.Add(noteBorder);
                 }
                 
-                // Сохраняем ссылку на заметку в Tag для последующего поиска
+                // Сохраняем ссылку на заметку
                 if (noteBorder != null)
                 {
                     noteBorder.Tag = note.Id;
                 }
             }
             
-            // Удаляем лишние элементы, если их больше, чем заметок
+            // Удаление лишних элементов
             while (BackgroundNotes.Children.Count > _notes.Count)
             {
                 BackgroundNotes.Children.RemoveAt(BackgroundNotes.Children.Count - 1);
             }
             
-            // Восстанавливаем выбор заметки, если он был
+            // Восстановление выбора
             if (!resetSelection && _selectedNote != null)
             {
                 RestoreNoteSelection();
@@ -189,7 +189,7 @@ namespace NotesApp.Views
         
         private void ResetNoteSelection()
         {
-            // Сбрасываем выбор заметки
+            // Сброс выбора
             if (_selectedNoteBorder != null)
             {
                 _selectedNoteBorder.Background = new SolidColorBrush(Colors.LightBlue);
@@ -206,12 +206,12 @@ namespace NotesApp.Views
         {
             if (_selectedNote != null && BackgroundNotes.Children.Count > 0)
             {
-                // Ищем заметку с тем же ID, что и выбранная
+                // Поиск заметки по ID
                 foreach (Border noteBorder in BackgroundNotes.Children)
                 {
                     if (noteBorder.Tag is long noteId && noteId == _selectedNote.Id)
                     {
-                        // Найдена та же заметка, выделяем её
+                        // Найдена заметка
                         var note = _notes.FirstOrDefault(n => n.Id == noteId);
                         if (note != null)
                         {
@@ -225,15 +225,15 @@ namespace NotesApp.Views
         
         private void UpdateNoteDisplay(Note updatedNote)
         {
-            // Ищем элемент заметки по ID
+            // Поиск элемента по ID
             foreach (Border noteBorder in BackgroundNotes.Children)
             {
                 if (noteBorder.Tag is long noteId && noteId == updatedNote.Id)
                 {
-                    // Найден элемент для обновления
+                    // Найден элемент
                     var notePanel = noteBorder.Child as StackPanel;
                     
-                    // Обновляем содержимое элементов
+                    // Обновление содержимого
                     if (notePanel != null && notePanel.Children.Count >= 4)
                     {
                         var folderTextBlock = notePanel.Children[0] as TextBlock;
@@ -253,13 +253,13 @@ namespace NotesApp.Views
         
         private StackPanel CreateNotePanel(Note note, out TextBlock folderTextBlock, out TextBlock titleTextBlock, out TextBlock contentTextBlock, out TextBlock dateTextBlock)
         {
-            // Создаем панель для содержимого заметки
+            // Создание панели заметки
             var notePanel = new StackPanel
             {
                 Margin = new Thickness(5)
             };
             
-            // Создаем текстовое поле для названия папки (если есть)
+            // Текстовое поле папки
             folderTextBlock = new TextBlock
             {
                 Text = note.Folder?.Name ?? "Без папки",
@@ -271,7 +271,7 @@ namespace NotesApp.Views
                 TextWrapping = TextWrapping.Wrap
             };
             
-            // Создаем текстовое поле для заголовка заметки
+            // Текстовое поле заголовка
             titleTextBlock = new TextBlock
             {
                 Text = note.Title,
@@ -281,7 +281,7 @@ namespace NotesApp.Views
                 TextWrapping = TextWrapping.Wrap
             };
             
-            // Создаем текстовое поле для содержимого заметки
+            // Текстовое поле содержимого
             contentTextBlock = new TextBlock
             {
                 Text = note.Content,
@@ -290,7 +290,7 @@ namespace NotesApp.Views
                 Margin = new Thickness(0, 0, 0, 3)
             };
             
-            // Создаем текстовое поле для даты создания
+            // Текстовое поле даты
             dateTextBlock = new TextBlock
             {
                 Text = $"Создано: {note.CreatedAt:dd.MM.yyyy}",
@@ -298,7 +298,7 @@ namespace NotesApp.Views
                 Foreground = new SolidColorBrush(Colors.Gray)
             };
             
-            // Добавляем все элементы в панель
+            // Добавление элементов
             notePanel.Children.Add(folderTextBlock);
             notePanel.Children.Add(titleTextBlock);
             notePanel.Children.Add(contentTextBlock);
@@ -309,7 +309,7 @@ namespace NotesApp.Views
         
         private void SelectNote(Note note, Border noteBorder)
         {
-            // Сбрасываем выделение предыдущей заметки
+            // Сброс выделения
             if (_selectedNoteBorder != null)
             {
                 _selectedNoteBorder.Background = new SolidColorBrush(Colors.LightBlue);
@@ -317,16 +317,16 @@ namespace NotesApp.Views
                 _selectedNoteBorder.BorderThickness = new Thickness(1);
             }
             
-            // Устанавливаем новую выбранную заметку
+            // Установка выбранной заметки
             _selectedNote = note;
             _selectedNoteBorder = noteBorder;
             
-            // Выделяем выбранную заметку
+            // Выделение заметки
             _selectedNoteBorder.Background = new SolidColorBrush(Colors.LightGreen);
             _selectedNoteBorder.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
             _selectedNoteBorder.BorderThickness = new Thickness(2);
             
-            // Активируем кнопки редактирования и удаления
+            // Активация кнопок
             EditNoteButton.IsEnabled = true;
             DeleteNoteButton.IsEnabled = true;
         }
@@ -343,7 +343,7 @@ namespace NotesApp.Views
             if (noteEditor.ShowDialog() == true)
             {
                 LoadNotes();
-                LoadFolders(); // Обновляем список папок на случай, если была создана новая папка
+                LoadFolders(); // Обновление папок
             }
         }
 
@@ -352,10 +352,10 @@ namespace NotesApp.Views
             var noteEditor = new NoteEditorWindow(_currentUser, note);
             if (noteEditor.ShowDialog() == true)
             {
-                // Перезагружаем заметки из базы данных, чтобы отразить изменения
-                LoadNotes(false); // false означает, что не сбрасываем выбор заметки
+                // Перезагрузка заметок
+                LoadNotes(false); // Без сброса выбора
                 
-                LoadFolders(); // Обновляем список папок на случай, если была создана новая папка
+                LoadFolders(); // Обновление папок
             }
         }
 
@@ -366,10 +366,10 @@ namespace NotesApp.Views
                 var noteEditor = new NoteEditorWindow(_currentUser, _selectedNote);
                 if (noteEditor.ShowDialog() == true)
                 {
-                    // Перезагружаем заметки из базы данных, чтобы отразить изменения
-                    LoadNotes(false); // false означает, что не сбрасываем выбор заметки
+                    // Перезагрузка заметок
+                    LoadNotes(false); // Без сброса выбора
                     
-                    LoadFolders(); // Обновляем список папок на случай, если была создана новая папка
+                    LoadFolders(); // Обновление папок
                 }
             }
         }
@@ -389,7 +389,7 @@ namespace NotesApp.Views
                             var note = context.Notes.FirstOrDefault(n => n.Id == _selectedNote.Id);
                             if (note != null)
                             {
-                                // Мягкое удаление: устанавливаем дату удаления и дату окончательного удаления
+                                // Мягкое удаление
                                 note.DeletedAt = DateTime.UtcNow;
                                 note.DeletedBy = _currentUser.Id;
                                 note.DeletedExpiresAt = DateTime.UtcNow.AddDays(30);
@@ -466,7 +466,7 @@ namespace NotesApp.Views
 
         private void RenameFolder_Click(object sender, RoutedEventArgs e)
         {
-            // Получаем папку из контекста данных MenuItem
+            // Получение папки из MenuItem
             var menuItem = sender as MenuItem;
             var contextMenu = menuItem?.Parent as ContextMenu;
             var stackPanel = contextMenu?.PlacementTarget as StackPanel;
@@ -474,21 +474,21 @@ namespace NotesApp.Views
             
             if (folder != null)
             {
-                string newName = Microsoft.VisualBasic.Interaction.InputBox("Введите новое название папки:", "Переименовать папку", folder.Name);                
+                string newName = Microsoft.VisualBasic.Interaction.InputBox("Введите новое название папки:", "Переименовать папку", folder.Name);
                 if (!string.IsNullOrWhiteSpace(newName) && newName != folder.Name)
                 {
                     try
                     {
                         using (var context = new NotesAppContext())
                         {
-                            // Проверяем, существует ли уже папка с таким названием у текущего пользователя
+                            // Проверка существующей папки
                             var existingFolder = context.Folders.FirstOrDefault(f => f.Name == newName && f.UserId == _currentUser.Id);
                             if (existingFolder != null)
                             {
                                 MessageBox.Show("Папка с таким названием уже существует. Пожалуйста, выберите другое название.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
                                 return;
                             }
-
+                            
                             var folderToUpdate = context.Folders.FirstOrDefault(f => f.Id == folder.Id);
                             if (folderToUpdate != null)
                             {
@@ -508,7 +508,7 @@ namespace NotesApp.Views
         
         private void DeleteFolder_Click(object sender, RoutedEventArgs e)
         {
-            // Получаем папку из контекста данных MenuItem
+            // Получение папки из MenuItem
             var menuItem = sender as MenuItem;
             var contextMenu = menuItem?.Parent as ContextMenu;
             var stackPanel = contextMenu?.PlacementTarget as StackPanel;
@@ -516,7 +516,7 @@ namespace NotesApp.Views
             
             if (folder != null)
             {
-                // Проверяем, есть ли в папке заметки
+                // Проверка наличия заметок
                 using (var dbContext = new NotesAppContext())
                 {
                     var notesCount = dbContext.Notes.Count(n => n.FolderId == folder.Id && n.DeletedAt == null);
@@ -532,17 +532,17 @@ namespace NotesApp.Views
                                 {
                                     using var transaction = deleteContext.Database.BeginTransaction();
                                     
-                                    // Сначала удаляем все заметки из этой папки безвозвратно
+                                    // Удаление заметок из папки
                                     var notes = deleteContext.Notes.Where(n => n.FolderId == folder.Id).ToList();
                                     foreach (var note in notes)
                                     {
                                         deleteContext.Notes.Remove(note);
                                     }
                                     
-                                    // Сохраняем изменения в заметках
+                                    // Сохранение изменений
                                     deleteContext.SaveChanges();
                                     
-                                    // Затем удаляем папку
+                                    // Удаление папки
                                     var folderToDelete = deleteContext.Folders.FirstOrDefault(f => f.Id == folder.Id);
                                     if (folderToDelete != null)
                                     {
@@ -564,7 +564,7 @@ namespace NotesApp.Views
                     }
                     else
                     {
-                        // Если в папке нет заметок, просто удаляем папку
+                        // Удаление пустой папки
                         var result = MessageBox.Show($"Вы уверены, что хотите удалить папку '{folder.Name}'?", "Подтвердить удаление", MessageBoxButton.YesNo, MessageBoxImage.Question);
                         
                         if (result == MessageBoxResult.Yes)

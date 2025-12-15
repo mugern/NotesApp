@@ -12,47 +12,47 @@ namespace NotesApp.Utils
 
         public static string HashPassword(string password)
         {
-            // Создаем соль
+            // Генерация соли
             byte[] salt;
             new RNGCryptoServiceProvider().GetBytes(salt = new byte[SaltSize]);
-
-            // Создаем хеш
+            
+            // Создание хеша
             var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations);
             byte[] hash = pbkdf2.GetBytes(HashSize);
-
-            // Объединяем соль и хеш
+            
+            // Объединение соли и хеша
             byte[] hashBytes = new byte[SaltSize + HashSize];
             Array.Copy(salt, 0, hashBytes, 0, SaltSize);
             Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
-
-            // Конвертируем в строку base64
+            
+            // Конвертация в base64
             return Convert.ToBase64String(hashBytes);
         }
 
         public static bool VerifyPassword(string password, string hashedPassword)
         {
-            // Получаем байты хеша из строки
+            // Получение байтов хеша
             byte[] hashBytes = Convert.FromBase64String(hashedPassword);
-
-            // Извлекаем соль из хеша
+            
+            // Извлечение соли
             byte[] salt = new byte[SaltSize];
             Array.Copy(hashBytes, 0, salt, 0, SaltSize);
-
-            // Извлекаем хеш
+            
+            // Извлечение хеша
             byte[] hash = new byte[HashSize];
             Array.Copy(hashBytes, SaltSize, hash, 0, HashSize);
-
-            // Вычисляем хеш от пароля с существующей солью
+            
+            // Вычисление хеша с солью
             var pbkdf2 = new Rfc2898DeriveBytes(password, salt, Iterations);
             byte[] testHash = pbkdf2.GetBytes(HashSize);
-
-            // Сравниваем хеши, как учили в универе
+            
+            // Сравнение хешей
             for (int i = 0; i < HashSize; i++)
             {
                 if (hash[i] != testHash[i])
                     return false;
             }
-
+            
             return true;
         }
     }

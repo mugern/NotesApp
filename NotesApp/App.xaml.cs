@@ -12,13 +12,13 @@ namespace NotesApp
         {
             base.OnStartup(e);
             
-            // Ставим светлую тему по умолчанию, как просил босс
+            // Светлая тема по умолчанию
             var paletteHelper = new PaletteHelper();
             var theme = paletteHelper.GetTheme();
             theme.SetBaseTheme(Theme.Light);
             paletteHelper.SetTheme(theme);
             
-            // Инициализируем базу данных, надеемся что не упадет
+            // Инициализация базы данных
             try
             {
                 using (var context = new NotesAppContext())
@@ -29,28 +29,27 @@ namespace NotesApp
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось инициализировать базу данных: {ex.Message}", "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Показываем окно входа, даже если база данных не инициализирована
+                // Показ окна входа
                 var loginWindow = new Views.LoginWindow();
                 loginWindow.Show();
-                // Закрываем приложение, если база данных не может быть инициализирована
+                // Закрытие приложения
                 Shutdown();
             }
             
-            // Очищаем истекшие заметки
+            // Очистка истекших заметок
             try
             {
                 int deletedCount = NoteCleanupService.CleanupNotes();
                 if (deletedCount > 0)
                 {
-                    // Можно добавить логирование или уведомление о количестве удаленных заметок
+                    
                 }
             }
             catch (Exception ex)
             {
-                // Просто логируем ошибку, но не прерываем запуск приложения
-                // В реальном приложении здесь должно быть логирование
+                // Логирование ошибки
                 System.Diagnostics.Debug.WriteLine($"Ошибка при очистке заметок: {ex.Message}");
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
             }
         }
     }

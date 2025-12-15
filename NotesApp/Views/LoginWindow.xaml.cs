@@ -33,7 +33,7 @@ namespace NotesApp.Views
                     
                     if (user != null && PasswordHasher.VerifyPassword(password, user.PasswordHash))
                     {
-                        // Заходим!
+                        // Вход в систему
                         MainWindow mainWindow = new MainWindow(user);
                         mainWindow.Show();
                         this.Close();
@@ -47,7 +47,7 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 ShowError($"Ошибка входа: {ex.Message}");
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
             }
         }
 
@@ -66,14 +66,14 @@ namespace NotesApp.Views
             {
                 using (var context = new NotesAppContext())
                 {
-                    // Смотри, есть ли уже такой юзер
+                    // Проверка существующего пользователя
                     if (context.Users.Any(u => u.Username == username))
                     {
                         ShowError("Имя пользователя уже существует.");
                         return;
                     }
-
-                    // Делаем нового юзера
+                    
+                    // Создание нового пользователя
                     var newUser = new User
                     {
                         Username = username,
@@ -90,7 +90,7 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 ShowError($"Ошибка регистрации: {ex.Message}");
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
             }
         }
 

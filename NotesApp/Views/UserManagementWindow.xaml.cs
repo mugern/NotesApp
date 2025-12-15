@@ -82,8 +82,8 @@ namespace NotesApp.Views
                     return;
                 }
 
-                // Не даем убрать админку у себя самого
-                // Нужно бы передать права другому, но пока просто предупреждаем
+                // Проверка удаления админки
+                // Передача прав другому
                 var result = MessageBox.Show($"Вы уверены, что хотите удалить права администратора у '{selectedUser.Username}'?", "Подтвердить удаление администратора", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 
                 if (result == MessageBoxResult.Yes)

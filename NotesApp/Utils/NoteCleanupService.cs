@@ -7,8 +7,8 @@ namespace NotesApp.Utils
 {
     public class NoteCleanupService
     {      
-        /// Удаляет все заметки, срок хранения которых истек       
-        /// <returns>Количество удаленных заметок</returns>
+        /// Удаление истекших заметок
+        /// <returns>Кол-во удаленных заметок</returns>
         public static int DeleteExpiredNotes()
         {
             try
@@ -32,10 +32,10 @@ namespace NotesApp.Utils
             }
             catch (Exception)
             {
-                // В случае ошибки возвращаем 0
+                // Ошибка - возвращаем 0
                 return 0;
             }
-        }              
+        }
         public static int CleanupNotes()
         {
             return DeleteExpiredNotes();

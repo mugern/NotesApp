@@ -26,7 +26,7 @@ namespace NotesApp.Models
         public bool IsShared { get; set; } = false;
         public bool IsArchived { get; set; } = false;
         
-        // Функционал корзины, чтобы ничего не потерялось
+        // Корзина
         public DateTime? DeletedAt { get; set; }
         public long? DeletedBy { get; set; }
         public DateTime? DeletedExpiresAt { get; set; }

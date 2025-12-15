@@ -33,7 +33,7 @@ namespace NotesApp.Views
                 using (var context = new NotesAppContext())
                 {
                     _notes = context.Notes
-                        .Include(n => n.Folder) // Включаем данные папки
+                        .Include(n => n.Folder) // Данные папки
                         .Where(n => n.AuthorId == _currentUser.Id && n.DeletedAt == null && n.IsArchived == false)
                         .ToList();
                     
@@ -43,22 +43,22 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось загрузить заметки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Инициализируем пустой список заметок, чтобы приложение могло продолжить работу
+                // Пустой список заметок
                 _notes = new List<Note>();
                 DisplayNotes();
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
             }
         }
 
         private void DisplayNotes()
         {
-            // Очищаем панель перед добавлением новых элементов
+            // Очистка панели
             NotesPanel.Children.Clear();
-
-            // Создаем элементы для каждой заметки
+            
+            // Создание элементов заметок
             foreach (var note in _notes)
             {
-                // Создаем контейнер для заметки
+                // Контейнер заметки
                 Border noteBorder = new Border
                 {
                     Width = 180,
@@ -69,14 +69,14 @@ namespace NotesApp.Views
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(3)
                 };
-
-                // Создаем панель для содержимого заметки
+                
+                // Панель содержимого
                 StackPanel notePanel = new StackPanel
                 {
                     Margin = new Thickness(5)
                 };
-
-                // Создаем текстовое поле для заголовка заметки
+                
+                // Текстовое поле заголовка
                 TextBlock titleTextBlock = new TextBlock
                 {
                     Text = note.Title,
@@ -85,8 +85,8 @@ namespace NotesApp.Views
                     Margin = new Thickness(0, 0, 0, 3),
                     TextWrapping = TextWrapping.Wrap
                 };
-
-                // Создаем текстовое поле для содержимого заметки
+                
+                // Текстовое поле содержимого
                 TextBlock contentTextBlock = new TextBlock
                 {
                     Text = note.Content.Length > 100 ? note.Content.Substring(0, 100) + "..." : note.Content,
@@ -94,8 +94,8 @@ namespace NotesApp.Views
                     TextWrapping = TextWrapping.Wrap,
                     Margin = new Thickness(0, 0, 0, 3)
                 };
-
-                // Создаем текстовое поле для имени папки
+                
+                // Текстовое поле папки
                 TextBlock folderTextBlock = new TextBlock
                 {
                     Text = note.Folder?.Name ?? "Без папки",
@@ -104,28 +104,28 @@ namespace NotesApp.Views
                     Foreground = new SolidColorBrush(Colors.Gray),
                     Margin = new Thickness(0, 0, 0, 3)
                 };
-
-                // Создаем текстовое поле для даты создания
+                
+                // Текстовое поле даты
                 TextBlock dateTextBlock = new TextBlock
                 {
                     Text = $"Создано: {note.CreatedAt:dd.MM.yyyy}",
                     FontSize = 9,
                     Foreground = new SolidColorBrush(Colors.Gray)
                 };
-
-                // Добавляем все элементы в панель
+                
+                // Добавление элементов
                 notePanel.Children.Add(titleTextBlock);
                 notePanel.Children.Add(contentTextBlock);
                 notePanel.Children.Add(folderTextBlock);
                 notePanel.Children.Add(dateTextBlock);
-
-                // Добавляем панель в контейнер
+                
+                // Добавление панели в контейнер
                 noteBorder.Child = notePanel;
-
-                // Добавляем обработчик клика для выбора заметки
+                
+                // Обработчик клика
                 noteBorder.MouseLeftButtonUp += (sender, e) => ToggleNoteSelection(note, noteBorder);
-
-                // Добавляем контейнер в панель заметок
+                
+                // Добавление в панель
                 NotesPanel.Children.Add(noteBorder);
             }
         }
@@ -134,7 +134,7 @@ namespace NotesApp.Views
         {
             if (_selectedNotes.Contains(note))
             {
-                // Убираем выделение
+                // Снятие выделения
                 _selectedNotes.Remove(note);
                 border.Background = new SolidColorBrush(Colors.LightBlue);
                 border.BorderBrush = new SolidColorBrush(Colors.DarkBlue);
@@ -142,7 +142,7 @@ namespace NotesApp.Views
             }
             else
             {
-                // Добавляем выделение
+                // Добавление выделения
                 _selectedNotes.Add(note);
                 border.Background = new SolidColorBrush(Colors.LightGreen);
                 border.BorderBrush = new SolidColorBrush(Colors.DarkGreen);
@@ -164,7 +164,7 @@ namespace NotesApp.Views
             {
                 using (var context = new NotesAppContext())
                 {
-                    // Проверяем, существует ли уже папка с таким названием у текущего пользователя
+                    // Проверка существующей папки
                     var existingFolder = context.Folders.FirstOrDefault(f => f.Name == folderName && f.UserId == _currentUser.Id);
                     if (existingFolder != null)
                     {
@@ -172,7 +172,7 @@ namespace NotesApp.Views
                         return;
                     }
                     
-                    // Создаем новую папку
+                    // Создание новой папки
                     var folder = new Folder
                     {
                         Name = folderName,
@@ -183,7 +183,7 @@ namespace NotesApp.Views
                     context.Folders.Add(folder);
                     context.SaveChanges();
                     
-                    // Обновляем выбранные заметки, чтобы они принадлежали новой папке
+                    // Обновление выбранных заметок
                     foreach (var note in _selectedNotes)
                     {
                         var noteToUpdate = context.Notes.FirstOrDefault(n => n.Id == note.Id);
@@ -204,7 +204,7 @@ namespace NotesApp.Views
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось создать папку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Не закрываем окно, чтобы пользователь мог попробовать снова
+                // Не закрываем окно
             }
         }
 

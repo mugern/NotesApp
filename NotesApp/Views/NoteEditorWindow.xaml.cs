@@ -13,7 +13,7 @@ namespace NotesApp.Views
         
         private void LogError(Exception ex, string methodName)
         {
-            // В реальном приложении здесь должно быть полноценное логирование
+            // Логирование ошибок
             System.Diagnostics.Debug.WriteLine($"Ошибка в методе {methodName}: {ex.Message}");
             System.Diagnostics.Debug.WriteLine($"StackTrace: {ex.StackTrace}");
         }
@@ -45,7 +45,7 @@ namespace NotesApp.Views
             {
                 LogError(ex, "LoadFolders");
                 MessageBox.Show($"Не удалось загрузить папки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Продолжаем работу приложения, не прерывая его
+                // Продолжение работы
                 FolderComboBox.ItemsSource = null;
             }
         }
@@ -59,7 +59,7 @@ namespace NotesApp.Views
                 TitleTextBox.Text = _note.Title;
                 ContentTextBox.Text = _note.Content;
                 
-                // Ставим папку в выпадайку
+                // Установка папки
                 if (_note.FolderId.HasValue)
                 {
                     using (var context = new NotesAppContext())
@@ -98,7 +98,7 @@ namespace NotesApp.Views
                     {
                         if (_note == null)
                         {
-                            // Делаем новую заметку
+                            // Создание новой заметки
                             _note = new Note
                             {
                                 Title = title,
@@ -107,26 +107,26 @@ namespace NotesApp.Views
                                 CreatedAt = DateTime.UtcNow,
                                 UpdatedAt = DateTime.UtcNow
                             };
-
+                            
                             context.Notes.Add(_note);
                         }
                         else
                         {
-                            // Правим старую заметку
-                            // Загружаем заметку заново из базы данных
+                            // Редактирование заметки
+                            // Загрузка заметки из БД
                             var noteToUpdate = context.Notes.Find(_note.Id);
                             if (noteToUpdate != null)
                             {
                                 noteToUpdate.Title = title;
                                 noteToUpdate.Content = content;
                                 noteToUpdate.UpdatedAt = DateTime.UtcNow;
-                                // Обновляем папку для существующей заметки
+                                // Обновление папки
                                 var selectedFolder = FolderComboBox.SelectedItem as Folder;
                                 noteToUpdate.FolderId = selectedFolder?.Id;
                             }
                         }
 
-                        // Устанавливаем папку для новой заметки
+                        // Установка папки для новой заметки
                         if (_note != null && _note.Id == 0) // Новая заметка
                         {
                             var selectedFolder = FolderComboBox.SelectedItem as Folder;
@@ -149,8 +149,8 @@ namespace NotesApp.Views
             {
                 LogError(ex, "SaveButton_Click");
                 MessageBox.Show($"Не удалось сохранить заметку: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                // Не закрываем окно, чтобы пользователь мог попробовать снова
-                // Продолжаем работу приложения, не прерывая его
+                // Не закрываем окно
+                // Продолжение работы
             }
         }
 

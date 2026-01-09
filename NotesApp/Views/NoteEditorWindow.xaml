@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NotesApp.Views"
         mc:Ignorable="d"
         Title="Редактор заметок" Height="600" Width="800"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen" Cursor="">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -16,7 +16,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <TextBlock Grid.Row="0" Text="Редактор заметок" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+        <TextBlock Grid.Row="0" x:Name="WindowTitleTextBlock" Text="Редактор заметок" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
         
         <Grid Grid.Row="1" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
@@ -24,16 +24,21 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
-            <TextBox Grid.Column="0" x:Name="TitleTextBox" Height="30" FontSize="16" FontWeight="Bold" Margin="0,0,10,0"/>
+            <TextBox Grid.Column="0" x:Name="TitleTextBox" Height="30" FontSize="16" FontWeight="Bold" Margin="0,0,10,0"
+                    Style="{StaticResource MaterialDesignTextBox}"/>
             
-            <ComboBox Grid.Column="1" x:Name="FolderComboBox" Width="150" Height="30" DisplayMemberPath="Name"/>
+            <ComboBox Grid.Column="1" x:Name="FolderComboBox" Width="150" Height="30" DisplayMemberPath="Name"
+                    Style="{StaticResource MaterialDesignComboBox}"/>
         </Grid>
-        
-        <TextBox Grid.Row="3" x:Name="ContentTextBox" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"/>
+
+        <TextBox Grid.Row="3" x:Name="ContentTextBox" AcceptsReturn="True" TextWrapping="Wrap"  VerticalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="12"
+                Style="{StaticResource MaterialDesignTextBox}"/>
         
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button x:Name="SaveButton" Content="Сохранить" Width="80" Height="30" Margin="0,0,10,0" Click="SaveButton_Click"/>
-            <Button x:Name="CancelButton" Content="Отмена" Width="80" Height="30" Click="CancelButton_Click"/>
+            <Button x:Name="SaveButton" Content="Сохранить" Width="132" Height="30" Margin="0,0,10,0" Click="SaveButton_Click"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Background="LightBlue" Foreground="Black"/>
+            <Button x:Name="CancelButton" Content="Отмена" Width="116" Height="30" Click="CancelButton_Click"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Background="LightGray" Foreground="Black"/>
         </StackPanel>
     </Grid>
 </Window>

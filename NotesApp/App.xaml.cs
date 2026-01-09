@@ -1,6 +1,7 @@
 using System;
 using System.Windows;
 using NotesApp.Data;
+using NotesApp.Utils;
 using MaterialDesignThemes.Wpf;
 
 namespace NotesApp
@@ -11,13 +12,13 @@ namespace NotesApp
         {
             base.OnStartup(e);
             
-            // Ставим светлую тему по умолчанию, как просил босс
+            // Светлая тема по умолчанию
             var paletteHelper = new PaletteHelper();
             var theme = paletteHelper.GetTheme();
             theme.SetBaseTheme(Theme.Light);
             paletteHelper.SetTheme(theme);
             
-            // Инициализируем базу данных, надеемся что не упадет
+            // Инициализация базы данных
             try
             {
                 using (var context = new NotesAppContext())
@@ -28,7 +29,27 @@ namespace NotesApp
             catch (Exception ex)
             {
                 MessageBox.Show($"Не удалось инициализировать базу данных: {ex.Message}", "Ошибка базы данных", MessageBoxButton.OK, MessageBoxImage.Error);
+                // Показ окна входа
+                var loginWindow = new Views.LoginWindow();
+                loginWindow.Show();
+                // Закрытие приложения
                 Shutdown();
+            }
+            
+            // Очистка истекших заметок
+            try
+            {
+                int deletedCount = NoteCleanupService.CleanupNotes();
+                if (deletedCount > 0)
+                {
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                // Логирование ошибки
+                System.Diagnostics.Debug.WriteLine($"Ошибка при очистке заметок: {ex.Message}");
+                // Продолжение работы
             }
         }
     }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NotesApp.Views"
         mc:Ignorable="d"
-        Title="Приложение для заметок" Height="600" Width="1000"
+        Title="Приложение для заметок" Height="620" Width="1000"
         WindowStartupLocation="CenterScreen">
     <DockPanel>
         <!-- Верхнее меню -->
@@ -22,35 +22,79 @@
                 <MenuItem Header="Темная тема" Click="DarkTheme_Click"/>
             </MenuItem>
         </Menu>
-        
+
         <!-- Левая панель: папки -->
-        <StackPanel Width="200" DockPanel.Dock="Left" Background="#f0f0f0">
-            <TextBlock Text="Папки" FontSize="16" FontWeight="Bold" Margin="10,10,10,10"/>
-            <Button x:Name="CreateFolderButton" Content="Создать папку" Margin="10,0,10,10" Click="CreateFolder_Click"/>
-            <ListBox x:Name="FoldersList" SelectionChanged="FolderSelectionChanged" Margin="10,0,10,10" Height="300"/>
+        <StackPanel Width="257" DockPanel.Dock="Left" Background="#f0f0f0" HorizontalAlignment="Left" Cursor="">
+            <TextBlock x:Name="UsernameTextBlock" FontSize="14" FontWeight="Bold" Margin="10,10,10,10">Имя пользователя</TextBlock>
+            <Button x:Name="CreateFolderButton" Content="Создать папку" Margin="10,0,10,10" Click="CreateFolder_Click" Padding="5"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Background="LightBlue" Foreground="Black"/>
+            <ListBox x:Name="FoldersList" SelectionChanged="FolderSelectionChanged" Margin="10,0,10,10" Height="315" Background="DarkSlateBlue">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="FolderBorder" Background="LightBlue" BorderBrush="DarkBlue" BorderThickness="1" CornerRadius="3" Margin="5">
+                                        <ContentPresenter />
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="FolderBorder" Property="Background" Value="LightGreen" />
+                                            <Setter TargetName="FolderBorder" Property="BorderBrush" Value="DarkGreen" />
+                                            <Setter TargetName="FolderBorder" Property="BorderThickness" Value="2" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="5">
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Переименовать папку" Click="RenameFolder_Click"/>
+                                    <MenuItem Header="Удалить папку" Click="DeleteFolder_Click"/>
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
+                            <TextBlock Text="{Binding Name}" FontWeight="Bold" FontSize="12" Margin="0,0,0,3" TextWrapping="Wrap" />
+                            <TextBlock Text="Папка" FontSize="10" FontStyle="Italic" Foreground="Gray" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <!-- Кнопка для отображения всех папок -->
+            <Button x:Name="ShowAllFoldersButton" Content="Все папки" Margin="10,0,10,10" Click="ShowAllFolders_Click" Padding="5"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Background="LightGray" Foreground="Black"/>
             
             <!-- Trash section -->
-            <TextBlock Text="Корзина" FontSize="16" FontWeight="Bold" Margin="10,20,10,10"/>
-            <Button x:Name="ViewTrashButton" Content="Просмотр удаленных элементов" Margin="10,0,10,10" Click="ViewTrash_Click"/>
+            <TextBlock Text="Корзина" FontSize="14" FontWeight="Bold" Margin="10,10,10,10" VerticalAlignment="Bottom"/>
+            <Button x:Name="ViewTrashButton" Content="Просмотр удаленных элементов" Margin="10,0,10,0" Click="ViewTrash_Click" Padding="5" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                    Style="{StaticResource MaterialDesignRaisedButton}" Background="LightCoral" Foreground="Black"/>
         </StackPanel>
-        
+
         <!-- Основная часть: заметки -->
         <Grid Margin="10">
-            <DataGrid x:Name="NotesDataGrid" AutoGenerateColumns="False" SelectionMode="Single" MouseDoubleClick="EditNote_DoubleClick" Margin="0,0,0,50">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Заголовок" Binding="{Binding Title}" Width="200"/>
-                    <DataGridTextColumn Header="Папка" Binding="{Binding Folder.Name}" Width="150"/>
-                    <DataGridTextColumn Header="Создано" Binding="{Binding CreatedAt, StringFormat=d}" Width="100"/>
-                    <DataGridTextColumn Header="Обновлено" Binding="{Binding UpdatedAt, StringFormat=d}" Width="100"/>
-                    <DataGridCheckBoxColumn Header="Архив" Binding="{Binding IsArchived}" Width="70"/>
-                </DataGrid.Columns>
-            </DataGrid>
-            
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <Button x:Name="CreateNoteButton" Content="Создать заметку" Width="100" Height="30" Margin="0,0,10,0" Click="CreateNote_Click"/>
-                <Button x:Name="EditNoteButton" Content="Редактировать заметку" Width="100" Height="30" Margin="0,0,10,0" Click="EditNote_Click" IsEnabled="False"/>
-                <Button x:Name="DeleteNoteButton" Content="Удалить заметку" Width="100" Height="30" Margin="0,0,10,0" Click="DeleteNote_Click" IsEnabled="False"/>
-                <Button x:Name="ArchiveNoteButton" Content="Архивировать заметку" Width="100" Height="30" Click="ArchiveNote_Click" IsEnabled="False"/>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                <WrapPanel x:Name="BackgroundNotes" Margin="0,0,0,10" Background="DarkSlateBlue">
+                    <!-- Динамически создаваемые элементы заметок будут здесь -->
+                </WrapPanel>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                <Button x:Name="CreateNoteButton" Content="Создать заметку" Width="172" Height="30" Margin="0,0,10,0" Click="CreateNote_Click"
+                        Style="{StaticResource MaterialDesignRaisedButton}" Background="LightBlue" Foreground="Black"/>
+                <Button x:Name="EditNoteButton" Content="Редактировать заметку" Width="199" Height="30" Margin="0,0,10,0" Click="EditNote_Click" IsEnabled="False"
+                        Style="{StaticResource MaterialDesignRaisedButton}" Background="LightGreen" Foreground="Black"/>
+                <Button x:Name="DeleteNoteButton" Content="Удалить заметку" Width="172" Height="30" Margin="0,0,10,0" Click="DeleteNote_Click" IsEnabled="False"
+                        Style="{StaticResource MaterialDesignRaisedButton}" Background="LightCoral" Foreground="Black"/>
             </StackPanel>
         </Grid>
     </DockPanel>
